@@ -2,25 +2,44 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { PageNotFoundComponent } from './shared/components';
 
-import { HomeRoutingModule } from './home/home-routing.module';
+import { AppComponent } from './app.component';
+import { RemoteDeployRoutingModule } from './pages/remote-deploy/remote-deploy-routing.module';
 
 const routes: Routes = [
+  // {
+  //   path: '',
+  //   redirectTo: 'home',
+  //   pathMatch: 'full',
+  // },
   {
     path: '',
-    redirectTo: 'home',
-    pathMatch: 'full'
+    component: AppComponent,
+    children: [
+      {
+        path: 'remote-deploy',
+        loadChildren: () =>
+          import('./pages/remote-deploy/remote-deploy.module').then(
+            (m) => m.RemoteDeployModule
+          ),
+      },
+      {
+        path: '',
+        redirectTo: 'remote-deploy',
+        pathMatch: 'full',
+      },
+    ],
   },
   {
     path: '**',
     component: PageNotFoundComponent,
-  }
+  },
 ];
 
 @NgModule({
   imports: [
     RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' }),
-    HomeRoutingModule,
+    RemoteDeployRoutingModule,
   ],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

@@ -1,1 +1,13 @@
-<router-outlet></router-outlet>
+<thy-layout>
+  <thy-header thyTitle="talk is cheap show me the code">
+    <ng-template #headerContent>
+      <div></div>
+    </ng-template>
+  </thy-header>
+  <thy-layout style="height: 100px">
+    <thy-sidebar> Sidebar </thy-sidebar>
+    <thy-content>
+      <router-outlet></router-outlet>
+    </thy-content>
+  </thy-layout>
+</thy-layout>
