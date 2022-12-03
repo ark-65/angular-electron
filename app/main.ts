@@ -1,83 +1,110 @@
-import {app, BrowserWindow, screen} from 'electron';
+import { app, BrowserWindow, screen, Menu } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 
-let win: BrowserWindow = null;
+let mainWindow: BrowserWindow = null;
 const args = process.argv.slice(1),
-  serve = args.some(val => val === '--serve');
+  serve = args.some((val) => val === '--serve');
 
-function createWindow(): BrowserWindow {
+const isDev = process.env.NODE_ENV !== 'production';
+const isMac = process.platform === 'darwin';
 
+function createMainWindow(): BrowserWindow {
   const size = screen.getPrimaryDisplay().workAreaSize;
 
-  // Create the browser window.
-  win = new BrowserWindow({
+  // 创建浏览器窗口
+  mainWindow = new BrowserWindow({
     x: 0,
     y: 0,
     width: size.width,
     height: size.height,
     webPreferences: {
       nodeIntegration: true,
-      allowRunningInsecureContent: (serve),
-      contextIsolation: false,  // false if you want to run e2e test with Spectron
+      allowRunningInsecureContent: serve,
+      contextIsolation: false, // false if you want to run e2e test with Spectron
     },
   });
+
+  // 隐藏菜单栏
+  // mainWindow.autoHideMenuBar = true;
+
+  // 打开开发者工具如果是开发时
+  if (isDev) {
+    mainWindow.webContents.openDevTools();
+    console.log(app.name);
+  }
 
   if (serve) {
     const debug = require('electron-debug');
     debug();
 
     require('electron-reloader')(module);
-    win.loadURL('http://localhost:4200');
+    mainWindow.loadURL('http://localhost:4200');
   } else {
-    // Path when running electron executable
+    // 运行 electron 可执行文件时的路径
     let pathIndex = './index.html';
 
     if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
-       // Path when running electron in local folder
+      // 在本地文件夹中运行 electron 的路径
       pathIndex = '../dist/index.html';
     }
 
     const url = new URL(path.join('file:', __dirname, pathIndex));
-    win.loadURL(url.href);
+    mainWindow.loadURL(url.href);
   }
 
-  // Emitted when the window is closed.
-  win.on('closed', () => {
-    // Dereference the window object, usually you would store window
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    win = null;
+  // 窗口关闭时发出。
+  mainWindow.on('closed', () => {
+    // 取消引用窗口对象，如果你的应用支持多窗口，通常你会把窗口存储在一个数组中，这时候你应该删除相应的元素。
+    mainWindow = null;
   });
 
-  return win;
+  return mainWindow;
 }
 
 try {
-  // This method will be called when Electron has finished
-  // initialization and is ready to create browser windows.
-  // Some APIs can only be used after this event occurs.
-  // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
-  app.on('ready', () => setTimeout(createWindow, 400));
+  // 当 Electron 完成初始化并准备好创建浏览器窗口时，将调用此方法。
+  // 某些 API 只能在该事件发生后使用。添加了 400 毫秒以修复使用透明窗口时的黑色背景问题。
+  // 更多详情请访问 https:github.com/electron/electron/issues/15947
+  app.on('ready', () => {
+    setTimeout(createMainWindow, 400);
 
-  // Quit when all windows are closed.
+    const mainMenu = Menu.buildFromTemplate(menu);
+    Menu.setApplicationMenu(mainMenu);
+
+    // mainWindow.on('closed', () => (mainWindow = null));
+  });
+
+  // 关闭所有窗口后退出。
   app.on('window-all-closed', () => {
-    // On OS X it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') {
+    // 在 OS X 上，应用程序及其菜单栏通常会保持活动状态，直到用户使用 Cmd + Q 显式退出
+    if (!isMac) {
       app.quit();
     }
   });
 
   app.on('activate', () => {
-    // On OS X it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (win === null) {
-      createWindow();
+    // 在 OS X 上，当单击停靠栏图标并且没有其他窗口打开时，通常会在应用程序中重新创建一个窗口。
+    if (mainWindow === null) {
+      createMainWindow();
     }
   });
-
 } catch (e) {
   // Catch Error
   // throw e;
 }
+const menu = [
+  ...(isMac
+    ? [
+      {
+        label: app.name,
+        submenu: [
+          {
+            label: '退出',
+            click: () => app.quit(),
+          },
+        ],
+      },
+    ]
+    : []),
+];

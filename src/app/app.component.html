@@ -1,13 +1,22 @@
 <thy-layout>
-  <thy-header thyTitle="talk is cheap show me the code">
+  <thy-header class="app-header" thyTitle="Demo">
     <ng-template #headerContent>
-      <div></div>
+      <div>
+        <thy-nav thyType="pulled">
+          <a
+            *ngFor="let item of navList"
+            thyNavItem
+            [thyNavItemActive]="item.index === activeIndex"
+            [routerLink]="item.link"
+            (click)="activeIndex = item.index"
+          >{{ item.name }}</a
+          >
+        </thy-nav>
+      </div>
     </ng-template>
   </thy-header>
-  <thy-layout style="height: 100px">
-    <thy-sidebar> Sidebar </thy-sidebar>
-    <thy-content>
-      <router-outlet></router-outlet>
-    </thy-content>
+  <thy-divider class="app-divider"></thy-divider>
+  <thy-layout style="padding: 20px">
+    <router-outlet></router-outlet>
   </thy-layout>
 </thy-layout>

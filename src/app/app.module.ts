@@ -14,6 +14,8 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppComponent } from './app.component';
 import { ThyLayoutModule } from 'ngx-tethys/layout';
 import { RemoteDeployModule } from './pages/remote-deploy/remote-deploy.module';
+import { ThyNavModule } from 'ngx-tethys/nav';
+import { ThyDividerModule } from 'ngx-tethys/divider';
 
 // AoT requires an exported function for factories
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
@@ -37,6 +39,8 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
       },
     }),
     ThyLayoutModule,
+    ThyNavModule,
+    ThyDividerModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

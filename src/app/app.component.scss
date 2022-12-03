@@ -1,0 +1,12 @@
+@use 'ngx-tethys/styles/variables';
+
+.app-header {
+  background: variables.$gray-70;
+  ::ng-deep .title-name {
+    display: block;
+    min-width: 200px;
+  }
+}
+.app-divider {
+  margin: 0;
+}
