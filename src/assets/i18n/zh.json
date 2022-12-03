@@ -1,0 +1,12 @@
+{
+  "PAGES": {
+    "HOME": {
+      "TITLE": "App 正在工作 !",
+      "GO_TO_DETAIL": "Go to Detail"
+    },
+    "DETAIL": {
+      "TITLE": "详情页 !",
+      "BACK_TO_HOME": "Back to Home"
+    }
+  }
+}
